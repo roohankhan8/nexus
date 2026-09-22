@@ -50,6 +50,14 @@ npm run start:dev
 - `PATCH /api/v1/projects/:projectId`
 - `DELETE /api/v1/projects/:projectId`
 
+## Tasks
+
+- `POST /api/v1/projects/:projectId/tasks`
+- `GET /api/v1/projects/:projectId/tasks`
+- `GET /api/v1/tasks/:taskId`
+- `PATCH /api/v1/tasks/:taskId`
+- `DELETE /api/v1/tasks/:taskId`
+
 Passwords are hashed with Argon2id. Access tokens are short-lived JWTs; refresh tokens are opaque, hashed in the database, rotated on use, and revoked on reuse detection.
 
 ## Commands

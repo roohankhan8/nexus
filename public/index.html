@@ -247,6 +247,19 @@
       </article>
 
       <article class="card wide">
+        <h2>Tasks</h2>
+        <form id="taskForm">
+          <label for="taskProjectId">Project ID</label><input id="taskProjectId" placeholder="Created project ID" />
+          <label for="taskTitle">Title</label><input id="taskTitle" value="Prepare launch checklist" />
+          <label for="taskDescription">Description</label><input id="taskDescription" value="Review the final release requirements." />
+          <div class="row">
+            <button type="submit">Create task</button>
+            <button type="button" id="listTasks" class="secondary">List tasks</button>
+          </div>
+        </form>
+      </article>
+
+      <article class="card wide">
         <h2>Session actions</h2>
         <div class="row">
           <button id="me" class="secondary">GET /auth/me</button>
@@ -282,8 +295,10 @@
       loginForm.addEventListener('submit', (event) => { event.preventDefault(); submit(event.currentTarget, '/auth/login', { email: loginEmail.value, password: loginPassword.value }); });
       organizationForm.addEventListener('submit', async (event) => { event.preventDefault(); try { const organization = await call('/organizations', { method: 'POST', body: JSON.stringify({ name: organizationName.value, slug: organizationSlug.value }) }); projectOrganizationId.value = organization.id; } catch (_) { } });
       listOrganizations.onclick = () => call('/organizations').catch(() => { });
-      projectForm.addEventListener('submit', (event) => { event.preventDefault(); call(`/organizations/${projectOrganizationId.value}/projects`, { method: 'POST', body: JSON.stringify({ name: projectName.value, slug: projectSlug.value, description: projectDescription.value }) }).catch(() => { }); });
+      projectForm.addEventListener('submit', async (event) => { event.preventDefault(); try { const project = await call(`/organizations/${projectOrganizationId.value}/projects`, { method: 'POST', body: JSON.stringify({ name: projectName.value, slug: projectSlug.value, description: projectDescription.value }) }); taskProjectId.value = project.id; } catch (_) { } });
       listProjects.onclick = () => call(`/organizations/${projectOrganizationId.value}/projects`).catch(() => { });
+      taskForm.addEventListener('submit', (event) => { event.preventDefault(); call(`/projects/${taskProjectId.value}/tasks`, { method: 'POST', body: JSON.stringify({ title: taskTitle.value, description: taskDescription.value }) }).catch(() => { }); });
+      listTasks.onclick = () => call(`/projects/${taskProjectId.value}/tasks`).catch(() => { });
       me.onclick = () => call('/auth/me').catch(() => { });
     refresh.onclick = async () => { try { writeTokens(await call('/auth/refresh', { method: 'POST', body: JSON.stringify({ refreshToken: read('refreshToken') }) })); } catch (_) { } };
     logout.onclick = async () => { try { await call('/auth/logout', { method: 'POST', body: JSON.stringify({ refreshToken: read('refreshToken') }) }); sessionStorage.clear(); updateStatus(); } catch (_) { } };
