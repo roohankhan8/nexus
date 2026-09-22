@@ -24,6 +24,16 @@ npm run start:dev
 - Liveness: http://localhost:3000/api/v1/health
 - Readiness: http://localhost:3000/api/v1/health/ready
 
+## Authentication
+
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/refresh`
+- `POST /api/v1/auth/logout`
+- `GET /api/v1/auth/me` with a bearer access token
+
+Passwords are hashed with Argon2id. Access tokens are short-lived JWTs; refresh tokens are opaque, hashed in the database, rotated on use, and revoked on reuse detection.
+
 ## Commands
 
 `npm run build`, `npm run lint`, `npm test`, `npm run test:e2e`, `npm run test:cov`, `npm run format`, `npm run db:generate`, `npm run db:migrate`, `npm run db:studio`, `npm run docker:up`, and `npm run docker:down`.
