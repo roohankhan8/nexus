@@ -23,7 +23,8 @@ export class AuthService {
   async register(dto: RegisterDto, metadata: RequestMetadata) {
     const email = this.normalizeEmail(dto.email);
     const existing = await this.prisma.user.findUnique({ where: { email } });
-    if (existing) throw new ConflictException('An account with this email already exists');
+    if (existing)
+      throw new ConflictException('An account with this email already exists');
 
     const user = await this.prisma.user.create({
       data: {
@@ -37,9 +38,14 @@ export class AuthService {
   }
 
   async login(dto: LoginDto, metadata: RequestMetadata) {
-    const user = await this.prisma.user.findUnique({ where: { email: this.normalizeEmail(dto.email) } });
-    const valid = user?.passwordHash ? await argon2.verify(user.passwordHash, dto.password) : false;
-    if (!user || !valid) throw new UnauthorizedException('Invalid email or password');
+    const user = await this.prisma.user.findUnique({
+      where: { email: this.normalizeEmail(dto.email) },
+    });
+    const valid = user?.passwordHash
+      ? await argon2.verify(user.passwordHash, dto.password)
+      : false;
+    if (!user || !valid)
+      throw new UnauthorizedException('Invalid email or password');
 
     return this.issueTokens(user.id, user.email, metadata);
   }
@@ -71,8 +77,14 @@ export class AuthService {
       where: { id: session.id, revokedAt: null },
       data: { revokedAt: new Date() },
     });
-    if (rotated.count !== 1) throw new UnauthorizedException('Refresh token reuse detected');
-    return this.issueTokens(session.user.id, session.user.email, metadata, session.familyId);
+    if (rotated.count !== 1)
+      throw new UnauthorizedException('Refresh token reuse detected');
+    return this.issueTokens(
+      session.user.id,
+      session.user.email,
+      metadata,
+      session.familyId,
+    );
   }
 
   async logout(refreshToken: string) {
@@ -89,16 +101,30 @@ export class AuthService {
   async getProfile(userId: string) {
     return this.prisma.user.findUniqueOrThrow({
       where: { id: userId },
-      select: { id: true, email: true, name: true, createdAt: true, updatedAt: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
-  private async issueTokens(userId: string, email: string, metadata: RequestMetadata, familyId: string = randomUUID()) {
+  private async issueTokens(
+    userId: string,
+    email: string,
+    metadata: RequestMetadata,
+    familyId: string = randomUUID(),
+  ) {
     const accessToken = await this.jwt.signAsync({ sub: userId, email });
     const sessionId = randomUUID();
     const refreshToken = `${sessionId}.${randomBytes(32).toString('hex')}`;
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + this.config.getOrThrow<number>('AUTH_REFRESH_TOKEN_DAYS'));
+    expiresAt.setDate(
+      expiresAt.getDate() +
+        this.config.getOrThrow<number>('AUTH_REFRESH_TOKEN_DAYS'),
+    );
 
     await this.prisma.refreshSession.create({
       data: {

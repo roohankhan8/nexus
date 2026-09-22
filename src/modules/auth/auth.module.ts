@@ -15,13 +15,15 @@ import { JwtAuthGuard } from './jwt-auth.guard';
       useFactory: (config: ConfigService) => ({
         secret: config.getOrThrow<string>('JWT_ACCESS_SECRET'),
         signOptions: {
-          expiresIn: config.getOrThrow<string>('JWT_ACCESS_EXPIRES_IN') as SignOptions['expiresIn'],
+          expiresIn: config.getOrThrow<string>(
+            'JWT_ACCESS_EXPIRES_IN',
+          ) as SignOptions['expiresIn'],
         },
       }),
     }),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtAuthGuard],
-  exports: [JwtAuthGuard],
+  exports: [JwtAuthGuard, JwtModule],
 })
 export class AuthModule {}

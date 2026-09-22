@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nexus API Console</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1020;
+      --panel: #121a2d;
+      --panel-2: #18233a;
+      --text: #edf2ff;
+      --muted: #91a0bd;
+      --line: #2b3958;
+      --accent: #8cf0c8;
+      --accent-ink: #082119;
+      --danger: #ff9b9b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top right, #1c3158 0, transparent 42%), var(--bg);
+      color: var(--text);
+      font: 15px/1.5 Inter, ui-sans-serif, system-ui, sans-serif;
+    }
+
+    main {
+      width: min(1100px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0;
+    }
+
+    header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    h1,
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      letter-spacing: -.04em;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1;
+    }
+
+    h2 {
+      font-size: 1.05rem;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-size: .72rem;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-top: 12px;
+      max-width: 520px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: color-mix(in srgb, var(--panel) 94%, transparent);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 18px 50px #0003;
+    }
+
+    .wide {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: .8rem;
+      margin: 16px 0 6px;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 11px 12px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px #8cf0c822;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font: inherit;
+      font-weight: 800;
+      padding: 10px 14px;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    button:disabled {
+      cursor: wait;
+      opacity: .6;
+    }
+
+    pre {
+      min-height: 150px;
+      max-height: 380px;
+      overflow: auto;
+      margin: 14px 0 0;
+      padding: 14px;
+      border-radius: 12px;
+      background: #080d18;
+      color: #c8d4ed;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+    @media (max-width: 760px) {
+      main {
+        padding: 28px 0;
+      }
+
+      header {
+        display: block;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .wide {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <header>
+      <div>
+        <div class="eyebrow">Nexus / local console</div>
+        <h1>Test the API.</h1>
+        <p class="subtitle">A tiny browser console for exercising authentication while the backend is under
+          construction.</p>
+      </div>
+      <div class="status" id="sessionStatus">No active session</div>
+    </header>
+
+    <section class="grid">
+      <article class="card">
+        <h2>Register</h2>
+        <form id="registerForm">
+          <label for="registerName">Name</label><input id="registerName" autocomplete="name" value="Demo User"
+            placeholder="Aisha Khan" />
+          <label for="registerEmail">Email</label><input id="registerEmail" type="email" required autocomplete="email"
+            value="demo@example.com" placeholder="you@example.com" />
+          <label for="registerPassword">Password</label><input id="registerPassword" type="password" required
+            minlength="12" autocomplete="new-password" value="NexusDemo!123" placeholder="12+ characters" />
+          <div class="row"><button>Create account</button></div>
+        </form>
+      </article>
+
+      <article class="card">
+        <h2>Login</h2>
+        <form id="loginForm">
+          <label for="loginEmail">Email</label><input id="loginEmail" type="email" required autocomplete="email"
+            value="demo@example.com" placeholder="you@example.com" />
+          <label for="loginPassword">Password</label><input id="loginPassword" type="password" required
+            autocomplete="current-password" value="NexusDemo!123" placeholder="Your password" />
+          <div class="row"><button>Sign in</button></div>
+        </form>
+      </article>
+
+      <article class="card wide">
+        <h2>Organizations</h2>
+        <form id="organizationForm">
+          <label for="organizationName">Name</label><input id="organizationName" value="Demo Workspace" />
+          <label for="organizationSlug">Slug</label><input id="organizationSlug" value="demo-workspace" />
+          <div class="row">
+            <button type="submit">Create organization</button>
+            <button type="button" id="listOrganizations" class="secondary">List my organizations</button>
+          </div>
+        </form>
+      </article>
+
+      <article class="card wide">
+        <h2>Session actions</h2>
+        <div class="row">
+          <button id="me" class="secondary">GET /auth/me</button>
+          <button id="refresh" class="secondary">POST /auth/refresh</button>
+          <button id="logout" class="secondary">POST /auth/logout</button>
+          <button id="health" class="secondary">GET /health</button>
+          <a href="/api/docs" target="_blank" rel="noreferrer"><button type="button" class="secondary">Open
+              Swagger</button></a>
+        </div>
+        <pre id="output">Responses will appear here.</pre>
+      </article>
+    </section>
+  </main>
+  <script>
+    const base = '/api/v1';
+    const output = document.querySelector('#output');
+    const status = document.querySelector('#sessionStatus');
+    const read = (key) => sessionStorage.getItem(key);
+    const writeTokens = (data) => { if (data.accessToken) sessionStorage.setItem('accessToken', data.accessToken); if (data.refreshToken) sessionStorage.setItem('refreshToken', data.refreshToken); updateStatus(); };
+    const updateStatus = () => { status.textContent = read('accessToken') ? 'Access token stored in this tab' : 'No active session'; };
+    const show = (data) => { output.textContent = JSON.stringify(data, null, 2); };
+    async function call(path, options = {}) {
+      const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+      if (read('accessToken')) headers.Authorization = `Bearer ${read('accessToken')}`;
+      const response = await fetch(base + path, { ...options, headers });
+      const body = await response.json().catch(() => ({}));
+      show({ status: response.status, body });
+      if (!response.ok) throw new Error(body.message || 'Request failed');
+      return body;
+    }
+    async function submit(form, path, data) { const button = form.querySelector('button'); button.disabled = true; try { writeTokens(await call(path, { method: 'POST', body: JSON.stringify(data) })); } catch (_) { } finally { button.disabled = false; } }
+    registerForm.addEventListener('submit', (event) => { event.preventDefault(); submit(event.currentTarget, '/auth/register', { name: registerName.value, email: registerEmail.value, password: registerPassword.value }); });
+      loginForm.addEventListener('submit', (event) => { event.preventDefault(); submit(event.currentTarget, '/auth/login', { email: loginEmail.value, password: loginPassword.value }); });
+      organizationForm.addEventListener('submit', (event) => { event.preventDefault(); call('/organizations', { method: 'POST', body: JSON.stringify({ name: organizationName.value, slug: organizationSlug.value }) }).catch(() => { }); });
+      listOrganizations.onclick = () => call('/organizations').catch(() => { });
+      me.onclick = () => call('/auth/me').catch(() => { });
+    refresh.onclick = async () => { try { writeTokens(await call('/auth/refresh', { method: 'POST', body: JSON.stringify({ refreshToken: read('refreshToken') }) })); } catch (_) { } };
+    logout.onclick = async () => { try { await call('/auth/logout', { method: 'POST', body: JSON.stringify({ refreshToken: read('refreshToken') }) }); sessionStorage.clear(); updateStatus(); } catch (_) { } };
+    health.onclick = () => call('/health').catch(() => { });
+    updateStatus();
+  </script>
+</body>
+
+</html>

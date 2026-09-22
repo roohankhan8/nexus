@@ -19,6 +19,7 @@ npm run start:dev
 
 ## URLs
 
+- Local API console: http://localhost:3000/
 - API: http://localhost:3000/api/v1
 - Swagger: http://localhost:3000/api/docs
 - Liveness: http://localhost:3000/api/v1/health
@@ -31,6 +32,15 @@ npm run start:dev
 - `POST /api/v1/auth/refresh`
 - `POST /api/v1/auth/logout`
 - `GET /api/v1/auth/me` with a bearer access token
+
+## Organizations
+
+- `POST /api/v1/organizations`
+- `GET /api/v1/organizations`
+- `GET /api/v1/organizations/:organizationId`
+- `POST /api/v1/organizations/:organizationId/members`
+- `PATCH /api/v1/organizations/:organizationId/members/:memberId`
+- `DELETE /api/v1/organizations/:organizationId/members/:memberId`
 
 Passwords are hashed with Argon2id. Access tokens are short-lived JWTs; refresh tokens are opaque, hashed in the database, rotated on use, and revoked on reuse detection.
 
