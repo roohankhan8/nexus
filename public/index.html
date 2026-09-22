@@ -260,6 +260,30 @@
       </article>
 
       <article class="card wide">
+        <h2>Attachments</h2>
+        <form id="attachmentForm">
+          <label for="attachmentTaskId">Task ID</label><input id="attachmentTaskId" placeholder="Created task ID" />
+          <label for="attachmentFile">File</label><input id="attachmentFile" type="file" />
+          <div class="row">
+            <button type="submit">Upload file</button>
+            <button type="button" id="listAttachments" class="secondary">List attachments</button>
+          </div>
+        </form>
+      </article>
+
+      <article class="card wide">
+        <h2>Comments</h2>
+        <form id="commentForm">
+          <label for="commentTaskId">Task ID</label><input id="commentTaskId" placeholder="Created task ID" />
+          <label for="commentContent">Comment</label><input id="commentContent" value="I reviewed this task." />
+          <div class="row">
+            <button type="submit">Add comment</button>
+            <button type="button" id="listComments" class="secondary">List comments</button>
+          </div>
+        </form>
+      </article>
+
+      <article class="card wide">
         <h2>Session actions</h2>
         <div class="row">
           <button id="me" class="secondary">GET /auth/me</button>
@@ -282,7 +306,8 @@
     const updateStatus = () => { status.textContent = read('accessToken') ? 'Access token stored in this tab' : 'No active session'; };
     const show = (data) => { output.textContent = JSON.stringify(data, null, 2); };
     async function call(path, options = {}) {
-      const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+        const isForm = options.body instanceof FormData;
+        const headers = { ...(isForm ? {} : { 'Content-Type': 'application/json' }), ...(options.headers || {}) };
       if (read('accessToken')) headers.Authorization = `Bearer ${read('accessToken')}`;
       const response = await fetch(base + path, { ...options, headers });
       const body = await response.json().catch(() => ({}));
@@ -297,8 +322,12 @@
       listOrganizations.onclick = () => call('/organizations').catch(() => { });
       projectForm.addEventListener('submit', async (event) => { event.preventDefault(); try { const project = await call(`/organizations/${projectOrganizationId.value}/projects`, { method: 'POST', body: JSON.stringify({ name: projectName.value, slug: projectSlug.value, description: projectDescription.value }) }); taskProjectId.value = project.id; } catch (_) { } });
       listProjects.onclick = () => call(`/organizations/${projectOrganizationId.value}/projects`).catch(() => { });
-      taskForm.addEventListener('submit', (event) => { event.preventDefault(); call(`/projects/${taskProjectId.value}/tasks`, { method: 'POST', body: JSON.stringify({ title: taskTitle.value, description: taskDescription.value }) }).catch(() => { }); });
+      taskForm.addEventListener('submit', async (event) => { event.preventDefault(); try { const task = await call(`/projects/${taskProjectId.value}/tasks`, { method: 'POST', body: JSON.stringify({ title: taskTitle.value, description: taskDescription.value }) }); commentTaskId.value = task.id; } catch (_) { } });
       listTasks.onclick = () => call(`/projects/${taskProjectId.value}/tasks`).catch(() => { });
+      attachmentForm.addEventListener('submit', (event) => { event.preventDefault(); const form = new FormData(); if (attachmentFile.files[0]) form.append('file', attachmentFile.files[0]); call(`/tasks/${attachmentTaskId.value}/attachments`, { method: 'POST', body: form }).catch(() => { }); });
+      listAttachments.onclick = () => call(`/tasks/${attachmentTaskId.value}/attachments`).catch(() => { });
+      commentForm.addEventListener('submit', (event) => { event.preventDefault(); call(`/tasks/${commentTaskId.value}/comments`, { method: 'POST', body: JSON.stringify({ content: commentContent.value }) }).catch(() => { }); });
+      listComments.onclick = () => call(`/tasks/${commentTaskId.value}/comments`).catch(() => { });
       me.onclick = () => call('/auth/me').catch(() => { });
     refresh.onclick = async () => { try { writeTokens(await call('/auth/refresh', { method: 'POST', body: JSON.stringify({ refreshToken: read('refreshToken') }) })); } catch (_) { } };
     logout.onclick = async () => { try { await call('/auth/logout', { method: 'POST', body: JSON.stringify({ refreshToken: read('refreshToken') }) }); sessionStorage.clear(); updateStatus(); } catch (_) { } };

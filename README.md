@@ -58,6 +58,22 @@ npm run start:dev
 - `PATCH /api/v1/tasks/:taskId`
 - `DELETE /api/v1/tasks/:taskId`
 
+## Comments
+
+- `POST /api/v1/tasks/:taskId/comments`
+- `GET /api/v1/tasks/:taskId/comments`
+- `PATCH /api/v1/comments/:commentId`
+- `DELETE /api/v1/comments/:commentId`
+
+## Attachments
+
+- `POST /api/v1/tasks/:taskId/attachments` (`multipart/form-data`, field: `file`)
+- `GET /api/v1/tasks/:taskId/attachments`
+- `GET /api/v1/attachments/:attachmentId/download`
+- `DELETE /api/v1/attachments/:attachmentId`
+
+Development uploads are stored under `storage/attachments/` and limited to 10 MB per file.
+
 Passwords are hashed with Argon2id. Access tokens are short-lived JWTs; refresh tokens are opaque, hashed in the database, rotated on use, and revoked on reuse detection.
 
 ## Commands
